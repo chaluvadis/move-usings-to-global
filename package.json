@@ -3,7 +3,7 @@
   "displayName": "GlobalUsings Helper",
   "description": "Move the usings in cs files to GlobalUsings.cs",
   "version": "0.0.1",
-  "icon": "./icon.png",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.103.0"
   },
