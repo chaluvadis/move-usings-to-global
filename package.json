@@ -1,25 +1,24 @@
 {
-  "name": "move-usings-to-global",
-  "displayName": "Move Usings to Global",
-  "description": "VSCode extension to refactor C# using statements into GlobalUsings.cs, supporting .cs, .csproj, and .sln context actions",
+  "name": "globalusings-helper",
+  "displayName": "GlobalUsings Helper",
+  "description": "Move the usings in cs files to GlobalUsings.cs",
   "version": "0.0.1",
-  "publisher": "chaluvadis",
+  "icon": "./icon.png",
   "engines": {
-    "vscode": "^1.70.0"
+    "vscode": "^1.103.0"
   },
   "categories": [
     "Other"
   ],
   "activationEvents": [
-    "onCommand:extension.moveUsingsToGlobal"
+    "onLanguage:csharp"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "extension.moveUsingsToGlobal",
-        "title": "Move Usings to GlobalUsings.cs",
-        "category": "C# Refactor"
+        "title": "Move Usings to GlobalUsings.cs"
       }
     ],
     "menus": {
@@ -33,15 +32,30 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile",
-    "test": "node ./out/test/runTest.js"
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.70.0",
-    "typescript": "^4.8.4",
-    "vscode-test": "^1.6.4"
+    "@types/vscode": "^1.103.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
+    "eslint": "^9.32.0",
+    "esbuild": "^0.25.8",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.2",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2"
   }
 }
