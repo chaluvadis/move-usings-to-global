@@ -1,6 +1,6 @@
 # Move Usings to GlobalUsings.cs
 
-A Visual Studio Code extension to refactor `using` statements in your C# projects. Move all top-level `using` statements to a `GlobalUsings.cs` file for a simplified and modern C# project structure.
+A Visual Studio Code extension to refactor `using` statements in your **C#** projects. Move all top-level `using` statements to a `GlobalUsings.cs` file for a simplified and modern **C#** project structure.
 
 ---
 
