@@ -1,6 +1,6 @@
-# Move Usings to GlobalUsings.cs VSCode Extension
+# Move Usings to GlobalUsings.cs
 
-A Visual Studio Code extension to refactor `using` statements in your C# projects. Move all top-level `using` statements to a `GlobalUsings.cs` file for simplified and modern C# project structure.
+A Visual Studio Code extension to refactor `using` statements in your C# projects. Move all top-level `using` statements to a `GlobalUsings.cs` file for a simplified and modern C# project structure.
 
 ---
 
@@ -15,24 +15,25 @@ A Visual Studio Code extension to refactor `using` statements in your C# project
 - **Right-click on `.sln` (solution) file:**  
   Parses the solution file for all referenced `.csproj` projects, applies the project-level logic to each project: all `using` statements are moved to their respective `GlobalUsings.cs` files.
 
-- **Duplicate `global using` statements are prevented** in the generated `GlobalUsings.cs`.
+- **Prevents duplicate `global using` statements** in the generated `GlobalUsings.cs`.
 
-- **Command available via right-click (context menu) in Explorer** for `.cs`, `.csproj`, and `.sln` files.
+- **Available via context menu:**  
+  Easily access the command by right-clicking `.cs`, `.csproj`, or `.sln` files in the Explorer sidebar.
 
 ---
 
 ## How to Use
 
-1. **Install the extension** in VSCode.
-2. **Right-click** a `.cs`, `.csproj`, or `.sln` file in the Explorer sidebar.
+1. **Install the extension** from the VS Code Marketplace.
+2. In the Explorer sidebar, **right-click** a `.cs`, `.csproj`, or `.sln` file.
 3. Select **"Move Usings to GlobalUsings.cs"** from the context menu.
-4. The extension will perform the refactor and show a notification when complete.
+4. The extension will refactor your code and display a notification when complete.
 
 ---
 
 ## Extension Icon
 
-The extension uses a simple SVG icon representing the "using" keyword and global scope.
+The extension features a simple SVG icon that visually represents the "using" keyword and global scope.
 
 ```svg
 <svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -43,16 +44,20 @@ The extension uses a simple SVG icon representing the "using" keyword and global
 </svg>
 ```
 
+<img src="./icon.png" alt="Extension Icon" />
+
 ---
 
 ## Contributing
 
-1. Fork the repo and clone locally.
-2. Open in VSCode, run and debug the extension.
-3. Submit a pull request for any improvements.
+We welcome contributions!
+
+1. Fork the repository and clone it locally.
+2. Open the project in VS Code, and use the built-in debugger to run and test the extension.
+3. Create a pull request detailing your changes and improvements.
 
 ---
 
 ## License
 
-MIT
+MIT License
