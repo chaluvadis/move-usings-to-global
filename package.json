@@ -8,13 +8,20 @@
     "vscode": "^1.103.0"
   },
   "categories": [
-    "Other"
+    "Programming Languages"
   ],
   "activationEvents": [
     "onLanguage:csharp"
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "languages": [
+      {
+        "id": "csharp",
+         "aliases": ["C#", "csharp"],
+        "extensions": [".cs"]
+      }
+    ],
     "commands": [
       {
         "command": "extension.moveUsingsToGlobal",
