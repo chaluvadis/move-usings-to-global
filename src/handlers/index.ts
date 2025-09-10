@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { DOMParser } from 'linkedom';
+import { DOMParser } from '@xmldom/xmldom';
 
 function getSkippedDirectories(): string[] {
     return vscode.workspace.getConfiguration('globalusings-helper')
@@ -198,17 +198,13 @@ async function parseSlnxFileAsync(slnxPath: string): Promise<string[]> {
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(content, "text/xml");
     const csprojPaths: string[] = [];
-    const folders = xmlDoc.getElementsByTagName('Folder');
-    for (let i = 0; i < folders.length; i++) {
-        const folder = folders[i];
-        const projects = folder.getElementsByTagName('Project');
-        for (let j = 0; j < projects.length; j++) {
-            const projPath = projects[j].getAttribute('Path');
-            if (projPath && projPath.endsWith('.csproj')) {
-                const absProjPath = path.resolve(slnxDir, projPath);
-                if (await fileExists(absProjPath)) {
-                    csprojPaths.push(absProjPath);
-                }
+    const projects = xmlDoc.getElementsByTagName('Project');
+    for (let j = 0; j < projects.length; j++) {
+        const projPath = projects[j].getAttribute('Path');
+        if (projPath && projPath.endsWith('.csproj')) {
+            const absProjPath = path.resolve(slnxDir, projPath);
+            if (await fileExists(absProjPath)) {
+                csprojPaths.push(absProjPath);
             }
         }
     }
