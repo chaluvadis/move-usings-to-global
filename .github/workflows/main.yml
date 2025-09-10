@@ -31,16 +31,21 @@ jobs:
       run: npm run compile
 
     - name: Package extension
-      run: npx vsce package
-
-    - name: Get version from tag
-      id: get_version
       run: |
-        echo "VSIX_NAME=$(ls *.vsix | head -n 1)" >> $GITHUB_ENV
+        # Use the tag name as part of the VSIX filename when available.
+        TAG="${{ github.ref_name }}"
+        if [ -z "$TAG" ]; then
+          TAG="$(echo "${GITHUB_SHA}" | cut -c1-7)"
+        fi
+        OUT="globalusings-helper-${TAG}.vsix"
+        echo "OUT=${OUT}" >> $GITHUB_ENV
+        echo "Packaging VSIX -> ${OUT}"
+        npx vsce package --out "${OUT}"
+      shell: bash
 
     - name: Create GitHub Release and upload VSIX
       uses: softprops/action-gh-release@v2
       with:
-        files: ${{ env.VSIX_NAME }}
+        files: ${{ env.OUT }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
