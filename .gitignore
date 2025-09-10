@@ -3,3 +3,4 @@ dist
 .vscode
 *.vsix
 *.log
+package-lock.json
