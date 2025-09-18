@@ -1,8 +1,9 @@
 {
   "name": "globalusings-helper",
-  "displayName": "GlobalUsings Helper",
+  "displayName": "Using to GlobalUsings",
+  "publisher": "nomad-in-code",
   "description": "Move the usings in cs files to GlobalUsings.cs",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "icon": "icon.png",
   "publisher": "nomad-in-code",
   "engines": {
