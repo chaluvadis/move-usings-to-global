@@ -3,7 +3,7 @@
   "displayName": "Using to GlobalUsings",
   "publisher": "nomad-in-code",
   "description": "Move the usings in cs files to GlobalUsings.cs",
-  "version": "0.0.3",
+  "version": "1.0.1",
   "icon": "icon.png",
   "publisher": "nomad-in-code",
   "engines": {
