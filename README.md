@@ -32,23 +32,6 @@ A Visual Studio Code extension to refactor `using` statements in your **C#** pro
 
 ---
 
-## Extension Icon
-
-The extension features a simple SVG icon that visually represents the "using" keyword and global scope.
-
-```svg
-<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="128" height="128" rx="24" fill="#007ACC"/>
-  <circle cx="64" cy="64" r="40" fill="#fff" stroke="#007ACC" stroke-width="4"/>
-  <text x="64" y="72" text-anchor="middle" font-size="30" font-family="monospace" fill="#007ACC" font-weight="bold">using</text>
-  <path d="M44 36 L84 92" stroke="#28a745" stroke-width="4" stroke-linecap="round"/>
-</svg>
-```
-
-<img src="./icon.png" alt="Extension Icon" />
-
----
-
 ## Contributing
 
 We welcome contributions!
