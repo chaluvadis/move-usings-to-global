@@ -7,26 +7,23 @@ A Visual Studio Code extension to refactor `using` statements in your **C#** pro
 
 ## Features
 
-- **Right-click on `.cs` file:**  
-  Move all `using` statements before the `namespace` declaration from the selected file into `GlobalUsings.cs` in the project root. Removes those `using` statements from the file.
-
 - **Right-click on `.csproj` file:**  
   Recursively scans all `.cs` files in the project folder (excluding `bin`, `obj`, `.vs`), moves all top-level `using` statements to `GlobalUsings.cs` in the project root, and removes them from the individual files.
 
-- **Right-click on `.sln` (solution) file:**  
+- **Right-click on `.sln` or `.slnx` (solution) file:**  
   Parses the solution file for all referenced `.csproj` projects, applies the project-level logic to each project: all `using` statements are moved to their respective `GlobalUsings.cs` files.
 
 - **Prevents duplicate `global using` statements** in the generated `GlobalUsings.cs`.
 
 - **Available via context menu:**  
-  Easily access the command by right-clicking `.cs`, `.csproj`, or `.sln` files in the Explorer sidebar.
+  Easily access the command by right-clicking `.csproj`, `.sln` or `.slnx` files in the Explorer sidebar.
 
 ---
 
 ## How to Use
 
 1. **Install the extension** from the VS Code Marketplace.
-2. In the Explorer sidebar, **right-click** a `.cs`, `.csproj`, or `.sln` file.
+2. In the Explorer sidebar, **right-click** a `.csproj`, `.sln` or `.slnx` file.
 3. Select **"Move Usings to GlobalUsings.cs"** from the context menu.
 4. The extension will refactor your code and display a notification when complete.
 
