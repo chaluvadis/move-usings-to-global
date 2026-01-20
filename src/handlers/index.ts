@@ -78,7 +78,8 @@ export async function handleCsFileAsync(csFilePath: string) {
                 .forEach(l => existingGlobalUsings.add(l));
         }
         usings.forEach(u => existingGlobalUsings.add(`global ${u}`));
-        await fs.writeFile(globalUsingsPath, Array.from(existingGlobalUsings).join('\n') + '\n', 'utf8');
+        const globalContent = formatGlobalUsings(existingGlobalUsings);
+        await fs.writeFile(globalUsingsPath, globalContent, 'utf8');
         vscode.window.showInformationMessage('Usings moved to GlobalUsings.cs!');
     } else {
         vscode.window.showInformationMessage('No usings to move.');
@@ -137,6 +138,7 @@ async function getProjectDir(filePath: string): Promise<string | null> {
 export function extractUsings(content: string): { usings: string[]; updatedContent: string } {
     const lines = content.split('\n');
     const usings: string[] = [];
+    const linesToRemove = new Set<number>();
     let namespaceIdx = lines.findIndex(l => l.trim().startsWith('namespace '));
     if (namespaceIdx === -1) { namespaceIdx = lines.length; }
 
@@ -144,12 +146,37 @@ export function extractUsings(content: string): { usings: string[]; updatedConte
         const trimmed = lines[i].trim();
         if (/^using\s+(static\s+)?[^=;]+(?:\s*=\s*[^;]+)?;\s*$/.test(trimmed)) {
             usings.push(trimmed);
-            lines[i] = '';
+            linesToRemove.add(i);
+        } else if (trimmed === '') {
+            // Mark empty lines in the using section (before namespace) for removal
+            linesToRemove.add(i);
         }
     }
 
-    const updatedContent = lines.filter(l => l.trim() !== '').join('\n').trim();
+    const updatedContent = lines.filter((_, idx) => !linesToRemove.has(idx)).join('\n');
     return { usings, updatedContent };
+}
+
+function formatGlobalUsings(usingsSet: Set<string>): string {
+    const sortedUsings = Array.from(usingsSet).sort((a, b) => {
+        const nsA = getNamespace(a);
+        const nsB = getNamespace(b);
+        if (nsA.startsWith('System') && !nsB.startsWith('System')) { return -1; }
+        if (!nsA.startsWith('System') && nsB.startsWith('System')) { return 1; }
+        if (nsA.startsWith('Microsoft') && !nsB.startsWith('Microsoft')) { return -1; }
+        if (!nsA.startsWith('Microsoft') && nsB.startsWith('Microsoft')) { return 1; }
+        return nsA.localeCompare(nsB);
+    });
+    
+    // Group usings and add empty lines between groups
+    // Extract namespaces once to avoid redundant computation
+    const usingsWithNamespace = sortedUsings.map(u => ({ using: u, namespace: getNamespace(u) }));
+    const systemUsings = usingsWithNamespace.filter(u => u.namespace.startsWith('System')).map(u => u.using);
+    const microsoftUsings = usingsWithNamespace.filter(u => !u.namespace.startsWith('System') && u.namespace.startsWith('Microsoft')).map(u => u.using);
+    const otherUsings = usingsWithNamespace.filter(u => !u.namespace.startsWith('System') && !u.namespace.startsWith('Microsoft')).map(u => u.using);
+    
+    const groups = [systemUsings, microsoftUsings, otherUsings].filter(g => g.length > 0);
+    return groups.map(g => g.join('\n')).join('\n\n') + '\n';
 }
 
 function getNamespace(usingLine: string): string {
@@ -177,16 +204,7 @@ async function writeGlobalUsings(projectDir: string, usingsSet: Set<string>) {
             .forEach(l => existing.add(l));
     }
     usingsSet.forEach(u => existing.add(`global ${u}`));
-    const sortedUsings = Array.from(existing).sort((a, b) => {
-        const nsA = getNamespace(a);
-        const nsB = getNamespace(b);
-        if (nsA.startsWith('System') && !nsB.startsWith('System')) { return -1; }
-        if (!nsA.startsWith('System') && nsB.startsWith('System')) { return 1; }
-        if (nsA.startsWith('Microsoft') && !nsB.startsWith('Microsoft')) { return -1; }
-        if (!nsA.startsWith('Microsoft') && nsB.startsWith('Microsoft')) { return 1; }
-        return nsA.localeCompare(nsB);
-    });
-    const globalContent = sortedUsings.join('\n') + '\n';
+    const globalContent = formatGlobalUsings(existing);
     await fs.writeFile(globalUsingsPath, globalContent, 'utf8');
     vscode.window.showInformationMessage('Usings moved to GlobalUsings.cs!');
 }
