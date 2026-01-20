@@ -169,9 +169,11 @@ function formatGlobalUsings(usingsSet: Set<string>): string {
     });
     
     // Group usings and add empty lines between groups
-    const systemUsings = sortedUsings.filter(u => getNamespace(u).startsWith('System'));
-    const microsoftUsings = sortedUsings.filter(u => !getNamespace(u).startsWith('System') && getNamespace(u).startsWith('Microsoft'));
-    const otherUsings = sortedUsings.filter(u => !getNamespace(u).startsWith('System') && !getNamespace(u).startsWith('Microsoft'));
+    // Extract namespaces once to avoid redundant computation
+    const usingsWithNamespace = sortedUsings.map(u => ({ using: u, namespace: getNamespace(u) }));
+    const systemUsings = usingsWithNamespace.filter(u => u.namespace.startsWith('System')).map(u => u.using);
+    const microsoftUsings = usingsWithNamespace.filter(u => !u.namespace.startsWith('System') && u.namespace.startsWith('Microsoft')).map(u => u.using);
+    const otherUsings = usingsWithNamespace.filter(u => !u.namespace.startsWith('System') && !u.namespace.startsWith('Microsoft')).map(u => u.using);
     
     const groups = [systemUsings, microsoftUsings, otherUsings].filter(g => g.length > 0);
     return groups.map(g => g.join('\n')).join('\n\n') + '\n';
