@@ -3,7 +3,7 @@
 A Visual Studio Code extension to refactor `using` statements in your **C#** projects. Move all top-level `using` statements to a `GlobalUsings.cs` file for a simplified and modern **C#** project structure.
 
 ---
-![Build & Release VS Code Extension](https://github.com/chaluvadis/move-usings-to-global/actions/workflows/main.yml/badge.svg)
+![Build & Release VS Code Extension](https://github.com/chaluvadis/relax-theme-semantic-focus/actions/workflows/main.yml/badge.svg)
 
 ## Features
 
