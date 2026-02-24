@@ -42,8 +42,15 @@
       "explorer/context": [
         {
           "command": "extension.moveUsingsToGlobal",
-          "when": "resourceExtname == .cs || resourceExtname == .csproj || resourceExtname == .sln|| resourceExtname == .slnx",
+          "when": "resourceExtname == .cs || resourceExtname == .csproj || resourceExtname == .sln || resourceExtname == .slnx",
           "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "extension.moveUsingsToGlobal",
+          "when": "resourceExtname == .cs",
+          "group": "1_modification"
         }
       ]
     },
