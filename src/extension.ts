@@ -1,8 +1,17 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { handleCsFileAsync, handleProjectAsync, handleSlnxFileAsync, handleSolutionAsync } from './handlers';
+import { MoveUsingsCodeActionProvider } from './codeActionProvider';
 
 export function activate(context: vscode.ExtensionContext) {
+	context.subscriptions.push(
+		vscode.languages.registerCodeActionsProvider(
+			{ language: 'csharp', scheme: 'file' },
+			new MoveUsingsCodeActionProvider(),
+			{ providedCodeActionKinds: MoveUsingsCodeActionProvider.providedCodeActionKinds }
+		)
+	);
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand('extension.moveUsingsToGlobal', async (fileUri: vscode.Uri) => {
 			try {
