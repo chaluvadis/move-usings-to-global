@@ -43,7 +43,7 @@ jobs:
         OUT="globalusings-helper-${TAG}.vsix"
         echo "OUT=${OUT}" >> $GITHUB_ENV
         echo "Packaging VSIX -> ${OUT}"
-        pnpm exec vsce package --out "${OUT}"
+        pnpm exec vsce package --out "${OUT}" --no-dependencies
       shell: bash
 
     - name: Get VSIX name
