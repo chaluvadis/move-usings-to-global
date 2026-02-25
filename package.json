@@ -1,108 +1,97 @@
 {
-  "name": "globalusings-helper",
-  "displayName": "Using to GlobalUsings",
-  "publisher": "nomad-in-code",
-  "description": "Move the usings in cs files to GlobalUsings.cs",
-  "version": "1.0.3",
-  "icon": "icon.png",
-  "publisher": "nomad-in-code",
-  "engines": {
-    "vscode": "^1.103.0"
-  },
-  "categories": [
-    "Other"
-  ],
-  "keywords": [
-    "csharp",
-    "global usings",
-    "move usings",
-    "dotnet"
-  ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/chaluvadis/move-usings-to-global"
-  },
-  "homepage": "https://github.com/chaluvadis/move-usings-to-global",
-  "bugs": {
-    "url": "https://github.com/chaluvadis/move-usings-to-global/issues"
-  },
-  "activationEvents": [
-    "onLanguage:csharp"
-  ],
-  "main": "./dist/extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "extension.moveUsingsToGlobal",
-        "title": "Move Usings to GlobalUsings.cs"
-      }
-    ],
-    "menus": {
-      "explorer/context": [
-        {
-          "command": "extension.moveUsingsToGlobal",
-          "when": "resourceExtname == .cs || resourceExtname == .csproj || resourceExtname == .sln || resourceExtname == .slnx",
-          "group": "navigation"
-        }
-      ],
-      "editor/context": [
-        {
-          "command": "extension.moveUsingsToGlobal",
-          "when": "resourceExtname == .cs",
-          "group": "1_modification"
-        }
-      ]
-    },
-    "configuration": {
-      "title": "GlobalUsings Helper",
-      "properties": {
-        "globalusings-helper.skippedDirectories": {
-          "type": "array",
-          "default": [
-            "bin",
-            "obj",
-            ".vs",
-            ".git",
-            "Properties"
-          ],
-          "description": "Directories to skip when searching for .cs files",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    }
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run package",
-    "compile": "npm run check-types && npm run lint && node esbuild.js",
-    "watch": "npm-run-all -p watch:*",
-    "watch:esbuild": "node esbuild.js --watch",
-    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-    "package": "npm run check-types && npm run lint && node esbuild.js --production",
-    "compile-tests": "tsc -p . --outDir dist",
-    "watch-tests": "tsc -p . -w --outDir dist",
-    "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "check-types": "tsc --noEmit",
-    "lint": "eslint src",
-    "test": "vscode-test"
-  },
-  "devDependencies": {
-    "@types/mocha": "^10.0.10",
-    "@types/node": "22.18.1",
-    "@types/vscode": "^1.103.0",
-    "@typescript-eslint/eslint-plugin": "^8.43.0",
-    "@typescript-eslint/parser": "^8.43.0",
-    "@vscode/test-cli": "^0.0.11",
-    "@vscode/test-electron": "^2.5.2",
-    "esbuild": "^0.25.9",
-    "eslint": "^9.35.0",
-    "npm-run-all": "^4.1.5",
-    "standard-version": "^9.5.0",
-    "typescript": "^5.9.2"
-  },
-  "dependencies": {
-    "@xmldom/xmldom": "^0.8.11"
-  }
+	"name": "globalusings-helper",
+	"displayName": "Move Using to GlobalUsings",
+	"description": "Move the usings in cs files to GlobalUsings.cs",
+	"version": "1.0.4",
+	"icon": "icon.png",
+	"publisher": "nomad-in-code",
+	"engines": {
+		"vscode": "^1.109.0"
+	},
+	"categories": [
+		"Other",
+		"Formatters",
+		"Programming Languages"
+	],
+	"keywords": [
+		"csharp",
+		"global usings",
+		"move usings",
+		"dotnet",
+		"c#"
+	],
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/chaluvadis/move-usings-to-global"
+	},
+	"homepage": "https://github.com/chaluvadis/move-usings-to-global",
+	"bugs": {
+		"url": "https://github.com/chaluvadis/move-usings-to-global/issues"
+	},
+	"activationEvents": [
+		"onLanguage:csharp"
+	],
+	"main": "./dist/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "extension.moveUsingsToGlobal",
+				"title": "Move Usings to GlobalUsings.cs"
+			}
+		],
+		"menus": {
+			"explorer/context": [
+				{
+					"command": "extension.moveUsingsToGlobal",
+					"when": "resourceExtname == .cs || resourceExtname == .csproj || resourceExtname == .sln || resourceExtname == .slnx",
+					"group": "navigation"
+				}
+			],
+			"editor/context": [
+				{
+					"command": "extension.moveUsingsToGlobal",
+					"when": "resourceExtname == .cs",
+					"group": "1_modification"
+				}
+			]
+		},
+		"configuration": {
+			"title": "GlobalUsings Helper",
+			"properties": {
+				"globalusings-helper.skippedDirectories": {
+					"type": "array",
+					"default": [
+						"bin",
+						"obj",
+						".vs",
+						".git",
+						"Properties"
+					],
+					"description": "Directories to skip when searching for .cs files",
+					"items": {
+						"type": "string"
+					}
+				}
+			}
+		}
+	},
+	"scripts": {
+		"compile": "tsc --noEmit && pnpm run lint && node esbuild.js",
+		"package": "pnpm run compile && vsce package --no-dependencies",
+		"lint": "eslint src"
+	},
+	"devDependencies": {
+		"@types/node": "25.3.0",
+		"@types/vscode": "^1.109.0",
+		"@typescript-eslint/eslint-plugin": "^8.56.1",
+		"@typescript-eslint/parser": "^8.56.1",
+		"esbuild": "^0.27.3",
+		"eslint": "^10.0.2",
+		"typescript": "^5.9.3",
+		"vsce": "^2.15.0"
+	},
+	"dependencies": {
+		"@xmldom/xmldom": "^0.8.11"
+	}
 }
