@@ -4,6 +4,13 @@ import * as path from "node:path";
 import { DOMParser } from "@xmldom/xmldom";
 import type * as fsMain from "node:fs";
 
+export interface ProjectPreviewResult {
+	projectDir: string;
+	globalUsingsPath: string;
+	globalUsingsContent: string;
+	csFilesWithUsings: number;
+}
+
 function getSkippedDirectories(): string[] {
 	return vscode.workspace
 		.getConfiguration("globalusings-helper")
@@ -309,4 +316,96 @@ async function fileExists(filePath: string): Promise<boolean> {
 	} catch {
 		return false;
 	}
+}
+
+// --- Preview (dry-run) functions ---
+
+async function buildMergedGlobalUsings(
+	projectDir: string,
+	newUsings: Set<string>,
+): Promise<Set<string>> {
+	const globalUsingsPath = path.join(projectDir, "GlobalUsings.cs");
+	const merged = new Set<string>();
+	if (await fileExists(globalUsingsPath)) {
+		const lines = (await fs.readFile(globalUsingsPath, "utf8")).split("\n");
+		lines
+			.map((l) => l.trim())
+			.filter((l) => l.startsWith("global using "))
+			.forEach((l) => merged.add(l));
+	}
+	newUsings.forEach((u) => merged.add(`global ${u}`));
+	return merged;
+}
+
+export async function previewProjectAsync(
+	csprojPath: string,
+): Promise<ProjectPreviewResult> {
+	const projectDir = path.dirname(csprojPath);
+	const csFiles = await findCsFilesRecursively(projectDir);
+	const newUsings = new Set<string>();
+	let csFilesWithUsings = 0;
+
+	await Promise.all(
+		csFiles.map(async (csFile) => {
+			try {
+				const content = await fs.readFile(csFile, "utf8");
+				const { usings } = extractUsings(content);
+				if (usings.length > 0) {
+					csFilesWithUsings++;
+					usings.forEach((u) => newUsings.add(u));
+				}
+			} catch {
+				// Ignore unreadable files
+			}
+		}),
+	);
+
+	const globalUsingsPath = path.join(projectDir, "GlobalUsings.cs");
+	const merged = await buildMergedGlobalUsings(projectDir, newUsings);
+	const globalUsingsContent =
+		merged.size > 0 ? formatGlobalUsings(merged) : "";
+	return { projectDir, globalUsingsPath, globalUsingsContent, csFilesWithUsings };
+}
+
+export async function previewSolutionAsync(
+	slnPath: string,
+): Promise<ProjectPreviewResult[]> {
+	const slnDir = path.dirname(slnPath);
+	const csprojPaths = await getCsprojPathsFromSln(slnPath, slnDir);
+	if (csprojPaths.length === 0) {
+		return [];
+	}
+	return Promise.all(csprojPaths.map(previewProjectAsync));
+}
+
+export async function previewSlnxFileAsync(
+	slnxPath: string,
+): Promise<ProjectPreviewResult[]> {
+	const csprojPaths = await parseSlnxFileAsync(slnxPath);
+	if (csprojPaths.length === 0) {
+		return [];
+	}
+	return Promise.all(csprojPaths.map(previewProjectAsync));
+}
+
+export async function previewCsFileAsync(
+	csFilePath: string,
+): Promise<ProjectPreviewResult | null> {
+	const projectDir = await getProjectDir(csFilePath);
+	if (!projectDir) {
+		return null;
+	}
+	const content = await fs.readFile(csFilePath, "utf8");
+	const { usings } = extractUsings(content);
+	const globalUsingsPath = path.join(projectDir, "GlobalUsings.cs");
+	const newUsings = new Set(usings);
+	const merged = await buildMergedGlobalUsings(projectDir, newUsings);
+	const globalUsingsContent =
+		merged.size > 0 ? formatGlobalUsings(merged) : "";
+	return {
+		projectDir,
+		globalUsingsPath,
+		globalUsingsContent,
+		csFilesWithUsings: usings.length > 0 ? 1 : 0,
+	};
 }

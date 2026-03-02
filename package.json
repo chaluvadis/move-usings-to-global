@@ -38,6 +38,10 @@
 			{
 				"command": "extension.moveUsingsToGlobal",
 				"title": "Move Usings to GlobalUsings.cs"
+			},
+			{
+				"command": "extension.previewMoveUsingsToGlobal",
+				"title": "Preview: Move Usings to GlobalUsings.cs"
 			}
 		],
 		"menus": {
@@ -46,11 +50,21 @@
 					"command": "extension.moveUsingsToGlobal",
 					"when": "resourceExtname == .cs || resourceExtname == .csproj || resourceExtname == .sln || resourceExtname == .slnx",
 					"group": "navigation"
+				},
+				{
+					"command": "extension.previewMoveUsingsToGlobal",
+					"when": "resourceExtname == .cs || resourceExtname == .csproj || resourceExtname == .sln || resourceExtname == .slnx",
+					"group": "navigation"
 				}
 			],
 			"editor/context": [
 				{
 					"command": "extension.moveUsingsToGlobal",
+					"when": "resourceExtname == .cs",
+					"group": "1_modification"
+				},
+				{
+					"command": "extension.previewMoveUsingsToGlobal",
 					"when": "resourceExtname == .cs",
 					"group": "1_modification"
 				}
