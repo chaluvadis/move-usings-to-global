@@ -24,7 +24,17 @@ export class MoveUsingsCodeActionProvider implements vscode.CodeActionProvider {
             arguments: [document.uri]
         };
 
-        return [action];
+        const previewAction = new vscode.CodeAction(
+            'Preview: Move usings to GlobalUsings.cs',
+            vscode.CodeActionKind.RefactorMove
+        );
+        previewAction.command = {
+            command: 'extension.previewMoveUsingsToGlobal',
+            title: 'Preview: Move usings to GlobalUsings.cs',
+            arguments: [document.uri]
+        };
+
+        return [action, previewAction];
     }
 
     private rangeContainsUsing(document: vscode.TextDocument, range: vscode.Range): boolean {
