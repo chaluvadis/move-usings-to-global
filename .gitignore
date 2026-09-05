@@ -4,3 +4,4 @@ dist
 *.vsix
 *.log
 package-lock.json
+pnpm-workspace.yaml

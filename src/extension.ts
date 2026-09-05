@@ -5,6 +5,7 @@ import {
 	handleProjectAsync,
 	handleSlnxFileAsync,
 	handleSolutionAsync,
+	handleWorkspaceAsync,
 	previewCsFileAsync,
 	previewProjectAsync,
 	previewSlnxFileAsync,
@@ -106,6 +107,21 @@ export function activate(context: vscode.ExtensionContext) {
 					}
 				} catch (err: any) {
 					vscode.window.showErrorMessage(`Error: ${err.message}`);
+				}
+			},
+		),
+	);
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand(
+			"extension.moveUsingsToGlobalWorkspace",
+			async () => {
+				try {
+					await handleWorkspaceAsync();
+				} catch (err: any) {
+					vscode.window.showErrorMessage(
+						`Error: ${err.message}`,
+					);
 				}
 			},
 		),

@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 const USING_REGEX = /^using\s+(static\s+)?[^=;]+(?:\s*=\s*[^;]+)?;\s*$/;
 
 export class MoveUsingsCodeActionProvider implements vscode.CodeActionProvider {
-    static readonly providedCodeActionKinds = [vscode.CodeActionKind.RefactorMove];
+    static readonly providedCodeActionKinds = [vscode.CodeActionKind.Refactor];
 
     provideCodeActions(
         document: vscode.TextDocument,
@@ -16,7 +16,7 @@ export class MoveUsingsCodeActionProvider implements vscode.CodeActionProvider {
 
         const action = new vscode.CodeAction(
             'Move usings to GlobalUsings.cs',
-            vscode.CodeActionKind.RefactorMove
+            vscode.CodeActionKind.Refactor
         );
         action.command = {
             command: 'extension.moveUsingsToGlobal',
@@ -26,7 +26,7 @@ export class MoveUsingsCodeActionProvider implements vscode.CodeActionProvider {
 
         const previewAction = new vscode.CodeAction(
             'Preview: Move usings to GlobalUsings.cs',
-            vscode.CodeActionKind.RefactorMove
+            vscode.CodeActionKind.Refactor
         );
         previewAction.command = {
             command: 'extension.previewMoveUsingsToGlobal',

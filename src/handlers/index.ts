@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
-import * as fs from "node:fs/promises";
+import * as fs from "./gu-fs-paths";
 import * as path from "node:path";
 import { DOMParser } from "@xmldom/xmldom";
 import type * as fsMain from "node:fs";
-
+import { getSkippedDirectories } from "../extensionConfig.js";
 export interface ProjectPreviewResult {
 	projectDir: string;
 	globalUsingsPath: string;
@@ -11,16 +11,10 @@ export interface ProjectPreviewResult {
 	csFilesWithUsings: number;
 }
 
-function getSkippedDirectories(): string[] {
-	return vscode.workspace
-		.getConfiguration("globalusings-helper")
-		.get("skippedDirectories", [
-			"bin",
-			"obj",
-			".vs",
-			".git",
-			"Properties",
-		]) as string[];
+export interface WorkspaceMoveResult {
+	projectDir: string;
+	success: boolean;
+	error?: string;
 }
 
 export async function handleSolutionAsync(slnPath: string) {
@@ -205,7 +199,7 @@ export function extractUsings(content: string): {
 	return { usings, updatedContent };
 }
 
-function formatGlobalUsings(usingsSet: Set<string>): string {
+export function formatGlobalUsings(usingsSet: Set<string>): string {
 	const sortedUsings = Array.from(usingsSet).sort((a, b) => {
 		const nsA = getNamespace(a);
 		const nsB = getNamespace(b);
@@ -254,7 +248,7 @@ function formatGlobalUsings(usingsSet: Set<string>): string {
 	return `${groups.map((g) => g.join("\n")).join("\n\n")}\n`;
 }
 
-function getNamespace(usingLine: string): string {
+export function getNamespace(usingLine: string): string {
 	const trimmed = usingLine.replace(/^global using /, "");
 	if (trimmed.startsWith("static ")) {
 		return trimmed.substring(7).replace(";", "");
@@ -316,6 +310,101 @@ async function fileExists(filePath: string): Promise<boolean> {
 	} catch {
 		return false;
 	}
+}
+
+// --- Workspace-wide handler ---
+
+let _handleProjectAsyncOverride: ((path: string) => Promise<void>) | null = null;
+
+export function __setHandleProjectAsync(
+	fn: ((path: string) => Promise<void>) | null,
+) {
+	_handleProjectAsyncOverride = fn;
+}
+
+export async function handleWorkspaceAsync(): Promise<WorkspaceMoveResult[]> {
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+	if (!workspaceFolders || workspaceFolders.length === 0) {
+		vscode.window.showWarningMessage(
+			"No workspace folder is currently open.",
+		);
+		return [];
+	}
+
+	const results: WorkspaceMoveResult[] = [];
+	const projectHandler = _handleProjectAsyncOverride ?? handleProjectAsync;
+
+	for (const folder of workspaceFolders) {
+		const csprojPaths = await findAllCsprojFilesAsync(folder.uri.fsPath);
+		for (const csprojPath of csprojPaths) {
+			try {
+				await projectHandler(csprojPath);
+				results.push({ projectDir: path.dirname(csprojPath), success: true });
+			} catch (err: any) {
+				results.push({
+					projectDir: path.dirname(csprojPath),
+					success: false,
+					error: err.message,
+				});
+			}
+		}
+	}
+
+	const succeeded = results.filter((r) => r.success).length;
+	const failed = results.filter((r) => !r.success);
+
+	if (results.length > 0) {
+		if (failed.length === 0) {
+			vscode.window.showInformationMessage(
+				`Usings moved to GlobalUsings.cs for all ${succeeded} project(s) in workspace!`,
+			);
+		} else {
+			const failedDirs = failed.map((r) => r.projectDir).join("\n");
+			vscode.window.showWarningMessage(
+				`Moved usings for ${succeeded} project(s); ${failed.length} failed:\n${failedDirs}`,
+			);
+		}
+	}
+
+	return results;
+}
+
+async function findAllCsprojFilesAsync(dir: string): Promise<string[]> {
+	const results: string[] = [];
+	const skippedDirs = getSkippedDirectories();
+	let dirents: fsMain.Dirent[] = [];
+	try {
+		dirents = await fs.readdir(dir, { withFileTypes: true });
+	} catch {
+		return results;
+	}
+	for (const dirent of dirents) {
+		try {
+			const name = dirent.name;
+			const filePath = path.join(dir, name);
+			let isDir = false;
+			try {
+				isDir =
+					dirent.isDirectory &&
+						typeof dirent.isDirectory === "function"
+						? dirent.isDirectory()
+						: (await fs.stat(filePath)).isDirectory();
+			} catch {
+				continue;
+			}
+			if (isDir) {
+				if (skippedDirs.includes(name) || name.startsWith(".")) {
+					continue;
+				}
+				results.push(...(await findAllCsprojFilesAsync(filePath)));
+			} else if (name.endsWith(".csproj")) {
+				results.push(filePath);
+			}
+		} catch {
+			// Ignore individual entry errors
+		}
+	}
+	return results;
 }
 
 // --- Preview (dry-run) functions ---

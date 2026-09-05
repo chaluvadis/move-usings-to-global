@@ -6,6 +6,9 @@
 			"ES2022",
 			"DOM"
 		],
+		"types": [
+			"node"
+		],
 		"sourceMap": true,
 		"rootDir": "src",
 		"outDir": "dist",
@@ -17,6 +20,8 @@
 	},
 	"exclude": [
 		"node_modules",
-		".vscode-test"
+		".vscode-test",
+		"dist",
+		"src/vitest.config.ts"
 	]
 }
